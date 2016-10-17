@@ -1,0 +1,66 @@
+Sub MoveSulfur()
+    Application.ScreenUpdating = False
+    Dim tfWs As Worksheet, ucdWs As Worksheet
+    Dim ucdWb As Workbook
+    
+    Dim godCell As Range, sCell As Range
+    Dim godCol As Long, sCol As Long, i As Long, j As Long, value1 As Range, value2 As Range
+    Dim godColLet As String, sColLet As String
+    
+    Dim idCol As Long, ucdsCol As Long
+    Dim idColLet As String, ucdsColLet As String
+    Dim idCell As Range, ucdsCell As Range
+    
+    Set ucdWb = Workbooks("test2.xlsm")
+    Set ucdWs = ucdWb.Sheets("Sheet1")
+    
+    Set tfWs = Sheets("Sheet1")
+    
+    With tfWs
+        Set godCell = .Range("A:D").Find(What:="God #", LookIn:=xlValues, LookAt:=xlWhole, MatchCase:=False, SearchFormat:=False)
+        Set sCell = .Range("A:D").Find(What:="Sulfur", LookIn:=xlValues, LookAt:=xlWhole, MatchCase:=False, SearchFormat:=False)
+        If Not godCell Is Nothing Then
+            godCol = godCell.Column
+            sCol = sCell.Column
+            
+            godColLet = ColName(godCol)
+            sColLet = ColName(sCol)
+            
+            Set idCell = ucdWs.Range("A:D").Find(What:="Id", LookIn:=xlValues, LookAt:=xlWhole, MatchCase:=False, SearchFormat:=False)
+            Set ucdsCell = ucdWs.Range("A:D").Find(What:="Sulfur", LookIn:=xlValues, LookAt:=xlWhole, MatchCase:=False, SearchFormat:=False)
+            
+            If Not idCell Is Nothing Then
+                idCol = idCell.Column
+                ucdsCol = ucdsCell.Column
+                
+                idColLet = ColName(idCol)
+                ucdsColLet = ColName(ucdsCol)
+                
+                For i = 2 To Cells(ucdWs.Rows.Count, ucdsColLet).End(xlUp).Row
+                    Set value1 = ucdWs.Range(idColLet & i)
+                    j = 2
+                    Set value2 = tfWs.Range(godColLet & j)
+                    Do
+                        Set value2 = tfWs.Range(godColLet & j)
+                        j = j + 1
+                        
+                    Loop While ((Not value1 = value2) And (j < 100))
+                    j = j - 1
+                    ucdWs.Range(ucdsColLet & i).Copy Destination:=tfWs.Range(sColLet & j)
+                Next i
+                
+            Else
+                MsgBox "UCD Not Found"
+         
+         End If
+         Else
+             MsgBox "Not Found"
+        End If
+    End With
+    Application.ScreenUpdating = True1
+End Sub
+
+
+Function ColName(colNum As Long) As String
+    ColName = Split(Worksheets(1).Cells(1, colNum).Address, "$")(1)
+End Function
